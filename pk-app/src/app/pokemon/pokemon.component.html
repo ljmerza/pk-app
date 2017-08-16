@@ -22,12 +22,13 @@
 </nav>
 
 
-<div *ngIf="shown_pokemon > 0">
+<div *ngIf="shown_pokemon.length > 0">
   <ul class="collection">
     <li class="collection-item" *ngFor="let pokemon of shown_pokemon" [style.backgroundColor]="pokemon.pokemon_types[0].color">
       <a href="https://maps.apple.com/maps?q={{pokemon.latitude}},{{pokemon.longitude}}">
         <div>
-          <span>{{pokemon.pokemon_name}} ({{pokemon.cp}})</span><span class='right'>{{pokemon.individual_attack}} | {{pokemon.individual_defense}} | {{pokemon.individual_stamina}}</span> 
+          <span>{{pokemon.pokemon_name}} <span *ngIf="pokemon.cp">({{pokemon.cp}})</span></span>
+          <span *ngIf="pokemon.individual_attack" class='right'>{{pokemon.individual_attack}} | {{pokemon.individual_defense}} | {{pokemon.individual_stamina}}</span> 
         </div>
       </a>
     </li>
@@ -35,4 +36,4 @@
 </div>
 
 
-<div *ngIf="shown_pokemon == 0">No pokemon available</div>
+<div *ngIf="shown_pokemon.length == 0">Loading pokemon please wait...</div>

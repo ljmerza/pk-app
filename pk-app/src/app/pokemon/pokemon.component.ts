@@ -25,7 +25,6 @@ export class PokemonComponent {
   	ngAfterViewInit() {
 		$(".button-collapse").sideNav();
 		this.refreshPokemonList();
- 		this.getPopularityX(4);
   	}
 
 
@@ -37,39 +36,52 @@ export class PokemonComponent {
     *  @return {None}
     */
 	refreshPokemonList() {
-		$.getJSON('localhost:3000/api/pokemons').then( data => {
+		$.getJSON('api/pokemon').then( data => {
 			this.pokemon_data = data.pokemons;
+			this.sortPokemon();
 		});
-	},
+	}
 
 
 	sortPokemon() {
+	    this.pokemon_data.sort( function compare(a, b){
+		    if(a.pokemon_name > b.pokemon_name) return 1;
+		    else if(a.pokemon_name < b.pokemon_name) return -1;
+	    	else return 0
+	    });
+
+
+	    console.log(this.pokemon_data)
+
 	    this.pokemon_data.forEach( pokemon => {
-			if(pokemon.pokemon_rarity.match(/common/i)){
+			if(pokemon.pokemon_rarity.match(/Common/i)){
 				this.common.push(pokemon);
-			} else if(pokemon.pokemon_rarity.match(/uncommon/i)){
+			} else if(pokemon.pokemon_rarity.match(/Uncommon/i)){
 				this.uncommon.push(pokemon);
-			}else if(pokemon.pokemon_rarity.match(/rare/i)){
+			}else if(pokemon.pokemon_rarity.match(/Rare/i)){
 				this.rare.push(pokemon);
-			}else if(pokemon.pokemon_rarity.match(/very rare/i)){
+			}else if(pokemon.pokemon_rarity.match(/Very Rare/i)){
 				this.veryRare.push(pokemon);
 			} else {
 				this.misc.push(pokemon);
 			}
 		});
-	},
+
+		this.getPopularityX(3)
+	}
 
 
 	getPopularityX(popularity=0) {
-		if(popularity = 1) {
+
+		if(popularity === 1) {
 			this.shown_pokemon = this.common
-		} else if(popularity = 2) {
+		} else if(popularity === 2) {
 			this.shown_pokemon = this.uncommon
-		} else if(popularity = 3) {
+		} else if(popularity === 3) {
 			this.shown_pokemon = this.rare
-		} else if(popularity = 4) {
+		} else if(popularity === 4) {
 			this.shown_pokemon = this.veryRare
-		} else if(popularity = 5) {
+		} else if(popularity === 5) {
 			this.shown_pokemon = this.misc
 		} else {
 			this.shown_pokemon = this.pokemon_data;

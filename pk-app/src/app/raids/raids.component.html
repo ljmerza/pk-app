@@ -22,7 +22,7 @@
 </nav>
 
 
-<div *ngIf="filtered_raid_data > 0">
+<div *ngIf="filtered_raid_data.length > 0">
   <ul class="collection">
     <li class="collection-item" *ngFor="let gym of filtered_raid_data" [style.backgroundColor]="gym.raid.pokemon_types[0].color">
       <a href="https://maps.apple.com/maps?q={{gym.latitude}},{{gym.longitude}}">
@@ -38,4 +38,4 @@
 </div>
 
 
-<div *ngIf="filtered_raid_data == 0">No raids available</div>
+<div *ngIf="filtered_raid_data.length == 0">No raids available</div>

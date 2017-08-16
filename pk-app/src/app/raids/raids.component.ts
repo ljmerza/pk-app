@@ -31,7 +31,7 @@ export class RaidsComponent {
     *  @return {None}
     */
   refreshGymList() {
-    $.getJSON('localhost:3000/api/gyms').then( data => {
+    $.getJSON('api/raids').then( data => {
 
       // get keys of gyms
       let gyms: any[] = Object.keys(data.gyms), dataArr = [];
