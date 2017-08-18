@@ -1,93 +1,239 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit  } from '@angular/core';
 
 declare var $ :any;
 
 @Component({
-  	selector: 'app-pokemon',
-  	templateUrl: './pokemon.component.html',
+	selector: 'app-pokemon',
+	templateUrl: './pokemon.component.html',
 	styleUrls: ['./pokemon.component.css']
 })
 export class PokemonComponent {
 
-  	constructor() { }
+	constructor() { }
 	
-  	title = 'Pokemon GO Pokemon';
+	title:string = 'Pokemon GO Pokemon';
+	loadingMessage:string = 'Loading Pokemon please wait...';
+	message:string = this.loadingMessage;
+	currentlyLoading:boolean = true;
 	
-  	common = [];
-  	uncommon = [];
-  	rare = [];
-  	veryRare = [];
-  	misc = [];
-	
-  	pokemon_data= [];
-  	shown_pokemon = [];
+	common:Array<object> = [];
+	uncommon:Array<object> = [];
+	rare:Array<object> = [];
+	veryRare:Array<object> = [];
+	ultraRare:Array<object> = [];
+	unknown:Array<object> = [];
 
-  	ngAfterViewInit() {
+	filteredRarity:string = 'ultra rare';
+	
+	pokemons = [];
+	pokemonsShown:Array<object> = [];
+
+	startTime:number = new Date().getTime()-10000000;
+
+	async ngAfterViewInit() {
 		$(".button-collapse").sideNav();
-		this.refreshPokemonList();
-  	}
+
+		this.pokemonRefresh();
+	}
+
+	resetFilteredData() {
+		return new Promise( resolve => {
+			this.common = [];
+			this.uncommon = [];
+			this.rare = [];
+			this.veryRare = [];
+			this.ultraRare = [];
+			this.unknown = [];
+			resolve()
+		});
+	}
 
 
-   /* refreshPokemonList
-    *  refreshes the pokemon list from the server and
-    *  stores it in an array
-    *
-    *  @param {None}
-    *  @return {None}
-    */
+	async pokemonRefresh() {
+
+		this.currentlyLoading = true;
+		this.message = this.loadingMessage;
+		await this.refreshPokemonList();
+		const myCoords = await this.getCoordinates();
+		await this.calcPokemonData(myCoords);
+		await this.sortByNameAndDistance();
+		await this.resetFilteredData();
+		await this.filterIntoRarityArrays();
+		await this.showByRarity();
+		this.doneLoading();
+	}
+
+	changeRarity(rarity:string){
+		this.filteredRarity = rarity;
+		this.showByRarity();
+		$('.button-collapse').sideNav('hide');
+	}
+
+
+	getCoordinates() {
+		return new Promise( resolve => {
+			navigator.geolocation.getCurrentPosition( data => {
+				resolve({lat:data.coords.latitude, long:data.coords.longitude});
+			});
+		});	
+	}
+
+
+	doneLoading() {
+		this.currentlyLoading = false;
+		this.message = 'No Pokemon Found.'
+	}
+
+
 	refreshPokemonList() {
-		$.getJSON('api/pokemon').then( data => {
-			this.pokemon_data = data.pokemons;
-			this.sortPokemon();
-		});
-	}
+		this.startTime += 1;
+    	const currentTime:number = new Date().getTime();
 
-
-	sortPokemon() {
-	    this.pokemon_data.sort( function compare(a, b){
-		    if(a.pokemon_name > b.pokemon_name) return 1;
-		    else if(a.pokemon_name < b.pokemon_name) return -1;
-	    	else return 0
+    	return $.getJSON(`api/pokemon/${this.startTime}/${currentTime}/`).then( data => {
+			this.pokemons = data.pokemons;
+		})
+		.fail( () => {
+	      this.message = 'Failed to load pokemon data.'
+	      this.currentlyLoading = false;
 	    });
-
-
-	    console.log(this.pokemon_data)
-
-	    this.pokemon_data.forEach( pokemon => {
-			if(pokemon.pokemon_rarity.match(/Common/i)){
-				this.common.push(pokemon);
-			} else if(pokemon.pokemon_rarity.match(/Uncommon/i)){
-				this.uncommon.push(pokemon);
-			}else if(pokemon.pokemon_rarity.match(/Rare/i)){
-				this.rare.push(pokemon);
-			}else if(pokemon.pokemon_rarity.match(/Very Rare/i)){
-				this.veryRare.push(pokemon);
-			} else {
-				this.misc.push(pokemon);
-			}
-		});
-
-		this.getPopularityX(3)
 	}
 
 
-	getPopularityX(popularity=0) {
+	compare(a,b){
+		if(a>b) return 1;
+		if(b>a) return -1;
+		return 0;
+	}
 
-		if(popularity === 1) {
-			this.shown_pokemon = this.common
-		} else if(popularity === 2) {
-			this.shown_pokemon = this.uncommon
-		} else if(popularity === 3) {
-			this.shown_pokemon = this.rare
-		} else if(popularity === 4) {
-			this.shown_pokemon = this.veryRare
-		} else if(popularity === 5) {
-			this.shown_pokemon = this.misc
+
+	calcPokemonData(myCoords) {
+		return new Promise( resolve => {
+			this.pokemons = this.pokemons.map( pokemon => {
+				// calc distance
+				pokemon.distance = this.distanceInMiBetweenEarthCoordinates(myCoords.lat, myCoords.long, pokemon.latitude, pokemon.longitude)
+
+				// calc IV
+				if(pokemon.individual_attack){
+					pokemon.iv = (pokemon.individual_attack + pokemon.individual_defense + pokemon.individual_stamina)/45 * 100;
+				}
+
+				return pokemon;
+			});
+
+			resolve();
+		});
+	}
+
+	sortByNameAndDistance() {
+		return new Promise( resolve => {
+			// sort by name then distance
+			this.pokemons = this.pokemons.sort( (a, b):number => {
+				return this.compare(a.pokemon_name, b.pokemon_name) || this.compare(a.distance,b.distance)
+			});
+
+			resolve();
+		});
+	}
+
+	filterIntoRarityArrays(){
+
+		const commonRegExp = /^common/i;
+		const uncommonRegExp = /^uncommon/i;
+		const rareRegExp = /^rare/i;
+		const veryRareRegExp = /^very/i;
+		const ultraRareRegExp = /^ultra/i;
+
+
+		return new Promise( resolve => {
+			const current_epoch = (new Date()).getTime();
+
+
+			this.pokemons = this.pokemons.map( pokemon => {
+
+				// filter out old pokemon data
+				if(current_epoch > pokemon.disappear_time) return;
+
+			 	if( commonRegExp.test(pokemon.pokemon_rarity) ){
+					this.common.push(pokemon);
+
+				} else if( uncommonRegExp.test(pokemon.pokemon_rarity) ){
+					this.uncommon.push(pokemon);
+
+				} else if( rareRegExp.test(pokemon.pokemon_rarity) ){
+					this.rare.push(pokemon);
+
+				} else if( veryRareRegExp.test(pokemon.pokemon_rarity) ){
+					this.veryRare.push(pokemon);
+
+				} else if( ultraRareRegExp.test(pokemon.pokemon_rarity) ){
+					this.ultraRare.push(pokemon);
+
+				} else {
+					this.unknown.push(pokemon);
+				}
+
+				return pokemon;
+			});
+
+			resolve();
+		});
+	}
+
+
+	showByRarity() {
+		const rarity = this.filteredRarity;
+
+		if( rarity.match(/$common/) ){
+			this.pokemonsShown = this.common.slice();
+
+		} else if( rarity.match(/^uncommon/) ){
+			this.pokemonsShown = this.uncommon.slice();
+
+		} else if( rarity.match(/^rare/) ){
+			this.pokemonsShown = this.rare.slice();
+
+		} else if( rarity.match(/^very/) ){
+			this.pokemonsShown = this.veryRare.slice();
+
+		} else if( rarity.match(/^ultra/) ){
+			this.pokemonsShown = this.ultraRare.slice();
+
+		} else if( rarity.match(/^unknown/) ){
+			this.pokemonsShown = this.unknown.slice();
+
+		} else if( rarity.match(/^all/) ){
+			this.pokemonsShown = this.pokemons.slice();
+
 		} else {
-			this.shown_pokemon = this.pokemon_data;
+			this.pokemonsShown = [];
 		}
 
-		$('.button-collapse').sideNav('hide');
+		return Promise.resolve();
+	}
+
+
+	degreesToRadians(degrees:number):number {
+		return degrees * Math.PI / 180;
+	}
+
+
+	distanceInMiBetweenEarthCoordinates(lat1, lon1, lat2, lon2):number {
+		const earthRadiusMi:number = 3958.754641;
+
+		const dLat:number = this.degreesToRadians(lat2-lat1);
+		const dLon:number = this.degreesToRadians(lon2-lon1);
+
+		lat1 = this.degreesToRadians(lat1);
+		lat2 = this.degreesToRadians(lat2);
+
+		const a:number = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+		const c:number = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+		return earthRadiusMi * c;
+	}
+
+
+	trackPokemon(index, pokemon) {
+		return pokemon ? pokemon.spawnpoint_id : undefined;
 	}
 
 }

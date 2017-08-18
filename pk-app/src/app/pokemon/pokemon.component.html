@@ -1,39 +1,58 @@
-
-<nav class='gray darken-4'>
-<div class="nav-wrapper">
-  <a href="#" class="brand-logo">Pokemon</a>
-  <a href="#" data-activates="pokemon-nav" class="button-collapse"><i class="material-icons">menu</i></a>
-  <ul class="side-nav" id="pokemon-nav">
-    <div class='links'>
-      <nav><div class="nav-wrapper gray darken-4"><div class="brand-logo">Pokemon</div></div></nav>
-      <li><a (click)="getPopularityX(0)">All Pokemon</a></li>
-      <li><a (click)="getPopularityX(4)">Very Rare</a></li>
-      <li><a (click)="getPopularityX(3)">Rare</a></li>
-      <li><a (click)="getPopularityX(2)">Uncommon</a></li>
-      <li><a (click)="getPopularityX(1)">Common</a></li>
-      <li><a (click)="getPopularityX(5)">Misc</a></li>
-      <div class='donate'>
-        <li><a href='https://venmo.com/leonardo-merza' target='_blank'>Donate via Venmo</a></li>
-        <li><a href='https://www.paypal.me/lmerza' target='_blank'>Donate via Paypal</a></li>
-      </div>
-    </div>
-  </ul>
-</div>
-</nav>
-
-
-<div *ngIf="shown_pokemon.length > 0">
-  <ul class="collection">
-    <li class="collection-item" *ngFor="let pokemon of shown_pokemon" [style.backgroundColor]="pokemon.pokemon_types[0].color">
-      <a href="https://maps.apple.com/maps?q={{pokemon.latitude}},{{pokemon.longitude}}">
-        <div>
-          <span>{{pokemon.pokemon_name}} <span *ngIf="pokemon.cp">({{pokemon.cp}})</span></span>
-          <span *ngIf="pokemon.individual_attack" class='right'>{{pokemon.individual_attack}} | {{pokemon.individual_defense}} | {{pokemon.individual_stamina}}</span> 
+<div class="navbar-fixed">
+  
+  <nav class='gray darken-4'>
+    <div class="nav-wrapper">
+      <a href="#" class="brand-logo">{{filteredRarity | titlecase}}</a> 
+      <a href="#" data-activates="pokemon-nav" class="button-collapse"><i class="material-icons">menu</i></a>
+      <span class='refresh-button' [ngClass]="{'loading': currentlyLoading}" (click)="pokemonRefresh()"><i class="material-icons">cached</i></span>
+      <ul class="side-nav" id="pokemon-nav">
+        <div class='links'>
+          <li><a (click)="changeRarity('all')">All Pokemon</a></li>
+          <li><a (click)="changeRarity('ultra rare')">Ultra Rare</a></li>
+          <li><a (click)="changeRarity('very rare')">Very Rare</a></li>
+          <li><a (click)="changeRarity('rare')">Rare</a></li>
+          <li><a (click)="changeRarity('uncommon')">Uncommon</a></li>
+          <li><a (click)="changeRarity('common')">Common</a></li>
+          <li><a (click)="changeRarity('unknown')">Unknown Rarity</a></li>
+          <div class='donate'>
+            <li><a href='https://venmo.com/leonardo-merza' target='_blank'>Donate via Venmo</a></li>
+            <li><a href='https://www.paypal.me/lmerza' target='_blank'>Donate via Paypal</a></li>
+            <li><a href='https://www.github.com/ljmerza' target='_blank'> Made with Angular and Node.js</a></li>
+            <li> </li>
+          </div>
         </div>
+      </ul>
+    </div>
+  </nav>
+</div>
+
+
+<div *ngIf="pokemonsShown.length > 0">
+  <ul class="collection">
+    <li class="collection-item" *ngFor="let pokemon of pokemonsShown; trackBy: trackPokemon" [style.backgroundColor]="pokemon.pokemon_types[0].color">
+
+      <a href="https://maps.apple.com/maps?q={{pokemon.latitude}},{{pokemon.longitude}}">
+
+        <div>
+          <span> <span class="name">{{pokemon.pokemon_name}}</span> </span>
+          <span class='right'>
+            <div>{{pokemon.distance | number:'1.0-0'}}mi</div>
+          </span>
+        </div>
+
+        <div class='stats'>
+          <span>ends {{pokemon.disappear_time | amTimeAgo}}</span>
+          <div><span *ngIf="pokemon.cp">{{pokemon.cp}}CP</span> <span *ngIf='pokemon.individual_attack'>@ {{pokemon.iv | number:'1.0-0'}}% IV</span></div>
+          <div *ngIf='pokemon.individual_attack'>
+            Atk: {{pokemon.individual_attack}} | Def: {{pokemon.individual_defense}} | Sta: {{pokemon.individual_stamina}} 
+          </div>
+        </div>
+
       </a>
+
     </li>
   </ul>
 </div>
 
 
-<div *ngIf="shown_pokemon.length == 0">Loading pokemon please wait...</div>
+<div class='message' *ngIf="pokemonsShown.length == 0">{{message}}</div>

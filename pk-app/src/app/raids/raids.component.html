@@ -1,41 +1,51 @@
-
-<nav class='gray darken-4'>
-<div class="nav-wrapper">
-  <a href="#" class="brand-logo">Raids</a>
-  <a href="#" data-activates="raid-nav" class="button-collapse"><i class="material-icons">menu</i></a>
-  <ul class="side-nav" id="raid-nav">
-    <div class='links'>
-      <nav><div class="nav-wrapper gray darken-4"><div class="brand-logo">Raids</div></div></nav>
-      <li><a (click)="getLevelX(0)">All Raids</a></li>
-      <li><a (click)="getLevelX(5)">Level 5</a></li>
-      <li><a (click)="getLevelX(4)">Level 4</a></li>
-      <li><a (click)="getLevelX(3)">Level 3</a></li>
-      <li><a (click)="getLevelX(2)">Level 2</a></li>
-      <li><a (click)="getLevelX(1)">Level 1</a></li>
-      <div class='donate'>
-        <li><a href='https://venmo.com/leonardo-merza' target='_blank'>Donate via Venmo</a></li>
-        <li><a href='https://www.paypal.me/lmerza' target='_blank'>Donate via Paypal</a></li>
-      </div>
+<div class="navbar-fixed">
+  <nav class='gray darken-4'>
+    <div class="nav-wrapper">
+      <a href="#" class="brand-logo">{{shownLevel}}</a>
+      <a href="#" data-activates="raid-nav" class="button-collapse"><i class="material-icons">menu</i></a>
+      <span class='refresh-button' [ngClass]="{'loading': currentlyLoading}" (click)="refreshGyms()"><i class="material-icons">cached</i></span>
+      <ul class="side-nav" id="raid-nav">
+        <div class='links'>
+          <li><a (click)="showByLevel(0)">All Raids</a></li>
+          <li><a (click)="showByLevel(5)">Level 5</a></li>
+          <li><a (click)="showByLevel(4)">Level 4</a></li>
+          <li><a (click)="showByLevel(3)">Level 3</a></li>
+          <li><a (click)="showByLevel(2)">Level 2</a></li>
+          <li><a (click)="showByLevel(1)">Level 1</a></li>
+          <div class='donate'>
+            <li><a href='https://venmo.com/leonardo-merza' target='_blank'>Donate via Venmo</a></li>
+            <li><a href='https://www.paypal.me/lmerza' target='_blank'>Donate via Paypal</a></li>
+            <li><a href='https://www.github.com/ljmerza' target='_blank'> Made with Angular and Node.js</a></li>
+          </div>
+        </div>
+      </ul>
     </div>
-  </ul>
+  </nav>
 </div>
-</nav>
 
 
-<div *ngIf="filtered_raid_data.length > 0">
+<div *ngIf="filteredRaids.length > 0">
   <ul class="collection">
-    <li class="collection-item" *ngFor="let gym of filtered_raid_data" [style.backgroundColor]="gym.raid.pokemon_types[0].color">
-      <a href="https://maps.apple.com/maps?q={{gym.latitude}},{{gym.longitude}}">
+    <li class="collection-item" *ngFor="let raid of filteredRaids" [style.backgroundColor]="raid.raid.pokemon_types[0].color">
+
+      <a href="https://maps.apple.com/maps?q={{raid.latitude}},{{raid.longitude}}">
+
         <div>
-          <span>{{gym.raid.pokemon_name}} (level {{gym.raid.level}})</span><span class='right'>{{gym.raid.end | date:'shortTime'}}</span> 
+          <span class='name'>{{raid.raid.pokemon_name}}</span>
+          <span class='right'><span *ngIf='level == "All"'>level {{raid.raid.level}} @</span> {{raid.raid.cp}}CP</span> 
         </div>
-        <div class='gymName'>
-          <span>{{gym.name}}</span>
+
+        <div class='stats'>
+         <div>ends {{raid.raid.end | amTimeAgo}}</div>
+          <div>{{raid.name}}</div>
+         
         </div>
+
       </a>
+
     </li>
   </ul>
 </div>
 
 
-<div *ngIf="filtered_raid_data.length == 0">No raids available</div>
+<div class='message' *ngIf="filteredRaids.length == 0">{{message}}</div>

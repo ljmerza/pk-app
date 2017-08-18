@@ -4,7 +4,7 @@ const request = require('request');
 const querystring = require('querystring');
 
 const base_url = 'https://chapelhill.monsterhunt.info/raw_data?';
-const params = {
+let params = {
 	pokemon: false,
 	pokestops: false,
 	luredonly: false,
@@ -23,19 +23,23 @@ const params = {
 	oNeLng: -78.69930681213378,
 
 	reids: '',
-	eids: '',
-	timestamp: new Date().getTime(),
-	_: (new Date().getTime())
+	eids: ''
 }
 
 let options = {};
 
 
 
-router.get('/raids', function(req, res, next) {
+router.get('/gyms/:start/:current', function(req, res, next) {
 
 	params.gyms= true;
 	params.lastgyms= true;
+	params.pokemon= false;
+	params.lastpokemon= false;
+
+	params._ = req.params.current;
+	params.timestamp = req.params.start;
+
 	options.url = base_url + querystring.stringify(params);
 
 	request(options, function (error, response, body) {
@@ -47,10 +51,16 @@ router.get('/raids', function(req, res, next) {
 
 
 
-router.get('/pokemon', function(req, res, next) {
+router.get('/pokemon/:start/:current', function(req, res, next) {
 
 	params.pokemon= true;
 	params.lastpokemon= true;
+	params.gyms= false;
+	params.lastgyms= false;
+
+	params._ = req.params.current;
+	params.timestamp = req.params.start;
+
 	options.url = base_url + querystring.stringify(params);
 
 	request(options, function (error, response, body) {
