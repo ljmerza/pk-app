@@ -1,4 +1,5 @@
 @import "~materialize-css/dist/css/materialize.css";
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
 
 .collection-item a {
 	color: white;
@@ -52,7 +53,6 @@ a {
 }
 
 
-
 .right {
 	text-align: right;
 }
@@ -66,7 +66,7 @@ a {
 }
 
 .name { 
-    font-size: 1.8em;
+    font-size: 1.8em !important;
 }
 
 nav a.button-collapse {
