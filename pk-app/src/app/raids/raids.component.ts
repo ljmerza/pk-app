@@ -1,125 +1,104 @@
 import { Component, AfterViewInit } from '@angular/core';
+import { RaidsService } from './../services/raids.service';
+
 
 declare var $ :any;
 
 @Component({
-  selector: 'app-raids',
-  templateUrl: './raids.component.html',
-  styleUrls: ['./raids.component.css']
+	selector: 'app-raids',
+	templateUrl: './raids.component.html',
+	styleUrls: ['./raids.component.css']
 })
 export class RaidsComponent {
 
-  constructor() { }
-
-  title:string = 'Pokemon GO Raids';
-  message:string = 'Loading Pokemon GO Raids list...';
-  level:number = 5;
-  shownLevel:string = 'Level 5';
-  currentlyLoading:boolean = true;
-
-  gyms = [];
-  raids = [];
-  filteredRaids = []
-
-  startTime:number = new Date().getTime()-10000000;
-
-  ngAfterViewInit() {
-  	$(".button-collapse").sideNav();
-    this.refreshGyms();
-  }
-
-  async refreshGyms(){
-    this.currentlyLoading = true;
-    await this.refreshGymList();
-    await this.getRaidsFromGyms();
-    await this.sortRaids();
-    await this.showByLevel(this.level);
-    this.doneLoading();
-  }
-
-  refreshGymList() {
-    this.startTime += 1;
-    const currentTime:number = new Date().getTime();
-
-    return $.getJSON(`api/gyms/${this.startTime}/${currentTime}/`).then( data => {
-      this.gyms = data.gyms;
-    })
-    .fail( () => {
-      this.message = 'Failed to load raid data.'
-      this.currentlyLoading = false;
-    });
-  }
-
-  doneLoading() {
-    this.currentlyLoading = false;
-    this.message = 'No Raids Found.'
-  }
+	/*
+	*
+	*
+	*
+	* 
+	*/
+	constructor(private service:RaidsService) { }
 
 
-  getRaidsFromGyms() {
+	title:string = 'Pokemon GO Raids'
 
-    const currentEpoch = (new Date()).getTime();
+	loadingMessage:string = 'Loading Pokemon GO raids...'
+	notFoundMessage:string = 'No raids found.'
+	currentMessage:string = this.loadingMessage
+	currentlyLoading:boolean = true
 
-    return new Promise( resolve => {
-      // reset raids array
-      this.raids = [];
+	currentLevel:number = 5
+	shownLevel:string = 'Level 5'
 
-      // for each gym object get selected raid level
-      for(let key in this.gyms){
-
-        // if enmd time passed then skip raid
-        // if(currentEpoch > this.gyms[key].raid.end) break;
-
-        if(this.gyms[key].raid.level > 0){
-          this.raids.push(this.gyms[key]);
-        }
-      }
-      resolve();
-    });
-  }
+	raids = []
+	shownRaids = []
 
 
-  sortRaids() {
-    return new Promise( resolve => {
-       this.raids.sort( function compare(a, b):number {
-        if(a.raid.level < b.raid.level) return 1;
-        else if(a.raid.level > b.raid.level) return -1;
-        else return 0
-      });
+	/*
+	*
+	*
+	*
+	* 
+	*/
+	ngAfterViewInit() {
+		$(".button-collapse").sideNav();
+		this.refreshRaids();
+	}
 
-      this.message = 'No raids available.';
-     resolve();
-   });
-  }
+	/*
+	*
+	*
+	*
+	* 
+	*/
+  	refreshRaids(){
+    	// set laoding vars
+    	this.currentMessage = this.loadingMessage;
+    	this.currentlyLoading = true;
 
+    	// get raids
+    	this.service.getFormattedRaids(raids => {
 
+    		// save all raids
+    		this.raids = raids;
 
-  showByLevel(newLevel:number=0) {
-    return new Promise( resolve => {
+	      	// show raids by currently selected level
+	      	this.showByLevel(this.currentLevel);
 
-      // set current level
-      this.level = newLevel;
+	      	// reset loading vars
+	      	this.currentMessage = this.notFoundMessage;
+	      	this.currentlyLoading = false;
+	    });
+  	}
 
-      // set header
-      if(newLevel == 0) this.shownLevel = 'All'
-      else this.shownLevel = `Level ${newLevel}`;
+  /*
+  *
+  *
+  *
+  * 
+   */
+  	showByLevel(newLevel:number) {
+		// set current level
+		this.currentLevel = newLevel;
 
-      // if level 0 then show all pokemon
-      if(!newLevel){
-        this.filteredRaids = this.raids;
-      } else {
-        // else filter by currently selected raid level
-        this.filteredRaids = this.raids.filter( gym => {
-          return gym.raid.level == newLevel;
-        });    
-      }
+		// set header for HTML
+		if(newLevel == 0) this.shownLevel = 'All'
+		else this.shownLevel = `Level ${newLevel}`;
 
-      // close nav menu
-      $('.button-collapse').sideNav('hide');
+		// if level null then show all pokemon
+		if(!newLevel){
+			this.shownRaids = this.raids;
 
-      resolve();
-    });
-  }
+		} else {
+			// else filter by currently selected raid level
+			this.shownRaids = this.raids.filter( gym => {
+				return gym.raid.level == newLevel;
+			});    
+		}
+
+		// close nav menu
+		$('.button-collapse').sideNav('hide');
+  	}
 
 
 }

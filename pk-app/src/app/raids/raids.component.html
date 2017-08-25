@@ -3,7 +3,7 @@
     <div class="nav-wrapper">
       <a href="#" class="brand-logo">{{shownLevel}}</a>
       <a href="#" data-activates="raid-nav" class="button-collapse"><i class="material-icons">menu</i></a>
-      <span class='refresh-button' [ngClass]="{'loading': currentlyLoading}" (click)="refreshGyms()"><i class="material-icons">cached</i></span>
+      <span class='refresh-button' [ngClass]="{'loading': currentlyLoading}" (click)="refreshRaids()"><i class="material-icons">cached</i></span>
       <ul class="side-nav" id="raid-nav">
         <div class='links'>
           <li><a (click)="showByLevel(0)">All Raids</a></li>
@@ -24,14 +24,15 @@
 </div>
 
 
-<div *ngIf="filteredRaids.length > 0">
+<div *ngIf="shownRaids.length > 0">
   <ul class="collection">
-    <li class="collection-item" *ngFor="let raid of filteredRaids" [style.backgroundColor]="raid.raid.pokemon_types[0].color">
+    <li class="collection-item" *ngFor="let raid of shownRaids" [style.backgroundColor]="raid.raid.pokemon_types[0].color">
 
       <a href="https://maps.apple.com/maps?q={{raid.latitude}},{{raid.longitude}}">
 
         <div>
           <span class='name'>{{raid.raid.pokemon_name}}</span>
+          <span *ngIf='currentLevel == 0'> ({{raid.raid.level}})</span>
           <span class='right'><span *ngIf='level == "All"'>level {{raid.raid.level}} @</span> {{raid.raid.cp}}CP</span> 
         </div>
 
@@ -48,4 +49,4 @@
 </div>
 
 
-<div class='message' *ngIf="filteredRaids.length == 0">{{message}}</div>
+<div class='message' *ngIf="shownRaids.length == 0">{{currentMessage}}</div>
