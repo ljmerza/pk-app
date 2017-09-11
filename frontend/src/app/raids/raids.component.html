@@ -1,0 +1,29 @@
+<div *ngIf="shownRaids.length > 0">
+  <ul class="collection">
+    <li 
+      class="collection-item" 
+      *ngFor="let raid of shownRaids" 
+      [style.backgroundColor]="raid.color"
+    >
+
+      <a href="https://maps.apple.com/maps?q={{raid.latitude}},{{raid.longitude}}">
+        <div>
+          <span class='name'>{{raid.pokemon_name}}</span>
+          <span *ngIf='currentLevel == 0'> ({{raid.level}})</span>
+          <span class='right'><span *ngIf='level == "All"'>level {{raid.level}} @</span> {{raid.cp}}CP</span> 
+        </div>
+
+        <div class='stats'>
+          <div>ends {{raid.end | amTimeAgo}}</div>
+          <div>{{raid.location_name}}</div>
+         
+        </div>
+
+      </a>
+
+    </li>
+  </ul>
+</div>
+
+
+<div class='message' *ngIf="shownRaids.length == 0">{{currentMessage}}</div>

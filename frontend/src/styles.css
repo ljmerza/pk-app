@@ -1,0 +1,110 @@
+@import "~materialize-css/dist/css/materialize.css";
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+
+.collection-item a {
+	color: white;
+	font-size: 1.3em;
+	padding-top: 0.3em;
+	padding-bottom: 0.5em;
+}
+
+
+nav {
+	background-color: #333333;
+}
+
+nav a {
+	font-size: 1.3em;
+}
+
+nav .brand-logo {
+	position: static;
+	display: inline;
+}
+
+a {
+	letter-spacing: 0.03em;
+}
+
+.brand-logo{
+	font-size: 2em !important;
+}
+
+
+.links{
+	position: relative;
+	height: 100%;
+}
+
+.collection .collection-item {
+	padding-bottom: 5px;
+}
+
+.donate { position: absolute; bottom: 0; }
+
+.message {
+	text-align: center;
+	margin-top: 20%;
+
+}
+
+#sidenav-overlay {
+	z-index: inherit !important;
+}
+
+
+.right {
+	text-align: right;
+}
+
+
+.stats{
+	margin-top: 0.7em;
+}
+.stats div {
+	margin-top: 0.2em;
+}
+
+.name { 
+    font-size: 1.8em !important;
+}
+
+nav a.button-collapse {
+	display: inline !important;
+}
+
+.refresh-button {
+	float: right;
+	margin-right: 2em;
+	cursor: pointer;
+
+}
+
+.refresh-button i {
+	font-size: 3em !important;
+	-moz-transform: scaleX(-1);
+	-o-transform: scaleX(-1);
+	-webkit-transform: scaleX(-1);
+	transform: scaleX(-1);
+	filter: FlipH;
+	-ms-filter: "FlipH";
+}
+
+.loading {
+		-webkit-animation: rotation 2s infinite linear;
+
+}
+
+@-webkit-keyframes rotation {
+		from {
+				-webkit-transform: rotate(0deg);
+		}
+		to {
+				-webkit-transform: rotate(359deg);
+		}
+}
+
+
+.side-nav {
+	padding-bottom: 30px;
+}
