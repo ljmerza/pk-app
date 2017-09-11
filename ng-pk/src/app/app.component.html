@@ -1,0 +1,69 @@
+<div class="navbar-fixed">
+	<nav class='grey darken-3'>
+		<div class="nav-wrapper">
+
+			<a href="#" class="brand-logo">{{title | titlecase}}</a> 
+			<a href="#" data-activates="pokemon-nav" class="button-collapse">
+				<i class="material-icons">menu</i>
+			</a>
+			<span class='refresh-button' 
+			[ngClass]="{'loading': isLoading}" 
+			(click)='refreshData()'>
+
+				<i class="material-icons">cached</i>
+			</span>
+
+			<ul class="side-nav" id="pokemon-nav">
+				<li>
+					<ul class="collapsible" data-collapsible="accordion">
+						<li>
+							<div class="user-view">
+							    <div class="background">
+							        <img src="assests/nav-image.jpg">
+							    </div>
+							    <a href="#!name"><span class="grey-text text-darken-4 name">UNC POGO</span></a>
+							    <a href="#!email"><span class="grey-text text-darken-4 email">ljmerza@gmail.com</span></a>
+							</div>
+						</li>
+					    <li>
+					      	<div class="collapsible-header"><i class="material-icons">track_changes</i>Raids</div>
+					      	<div class="collapsible-body">
+					      		<span>
+					      			<li><a [routerLink]="['/raids', 'all']" (click)="closeNav()">All Raids</a></li>
+									<li><a [routerLink]="['/raids', '5']" (click)="closeNav()">Level 5</a></li>
+									<li><a [routerLink]="['/raids', '4']" (click)="closeNav()">Level 4</a></li>
+									<li><a [routerLink]="['/raids', '3']" (click)="closeNav()">Level 3</a></li>
+									<li><a [routerLink]="['/raids', '2']" (click)="closeNav()">Level 2</a></li>
+									<li><a [routerLink]="['/raids', '1']" (click)="closeNav()">Level 1</a></li>
+								</span>
+					      	</div>
+					    </li>
+					    <li>
+					      	<div class="collapsible-header"><i class="material-icons">place</i>Pokemon</div>
+					      	<div class="collapsible-body">
+					      		<span>
+					      			<li><a [routerLink]="['/pokemon', 'all']" (click)="closeNav()">All Pokemon</a></li>
+									<li><a [routerLink]="['/pokemon', 'ultrarare']" (click)="closeNav()">Ultra Rare</a></li>
+									<li><a [routerLink]="['/pokemon', 'veryrare']" (click)="closeNav()">Very Rare</a></li>
+									<li><a [routerLink]="['/pokemon', 'rare']" (click)="closeNav()">Rare</a></li>
+									<li><a [routerLink]="['/pokemon', 'uncommon']" (click)="closeNav()">Uncommon</a></li>
+									<li><a [routerLink]="['/pokemon', 'common']" (click)="closeNav()">Common</a></li>
+									<li><a [routerLink]="['/pokemon', 'unknown']" (click)="closeNav()">Unknown Rarity</a></li>
+					      		</span>
+					      	</div>
+					    </li>
+					 </ul>
+				</li>
+				<li><div class="divider"></div></li>
+				<li><a href='https://venmo.com/leonardo-merza' target='_blank'>Donate via Venmo</a></li>
+				<li><a href='https://www.paypal.me/lmerza' target='_blank'>Donate via Paypal</a></li>
+				<li><a href='https://www.github.com/ljmerza' target='_blank'> Made with Angular and Node.js</a></li>
+			</ul>
+
+		</div>
+	</nav>
+</div>
+
+
+
+<router-outlet></router-outlet>
