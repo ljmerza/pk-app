@@ -65,9 +65,7 @@ export class RaidsService extends GymsService {
 		this.getGyms( gyms => {
 			const raids = this.getRaidsFromGyms(gyms)
 			const sortedRaids = this.sortByLevelAndName(raids)
-			console.log('sorted raids', sortedRaids)
 			const filteredData = this.filterData(sortedRaids)
-			console.log('sorted raids', filteredData)
 			this.raidData = filteredData
 			this.foundRaidData = true
 
@@ -88,8 +86,7 @@ export class RaidsService extends GymsService {
 		.filter( gym => {
 			return (gyms[gym].raid 
 				&& gyms[gym].raid.level > 0 
-				&& currentEpoch < gyms[gym].raid.end 
-				&& gyms[gym].raid.pokemon_name)
+				&& currentEpoch < gyms[gym].raid.end)
 		})
 		.map( gym => gyms[gym] )
 
@@ -112,6 +109,7 @@ export class RaidsService extends GymsService {
 				'color': raid.raid.pokemon_types ? raid.raid.pokemon_types[0].color : '#333333',
 				'latitude': raid.latitude,
 				'longitude': raid.longitude,
+				'spawn': raid.raid.spawn,
 				'end': raid.raid.end,
 				'team': raid.team_id == 1 ? 'Mystic' : raid.team_id == 2 ? 'Valor' : 'Instinct'
 			}
