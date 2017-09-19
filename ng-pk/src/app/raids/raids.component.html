@@ -18,8 +18,12 @@
 
           </span>
           <ng-template #egg>
-            <span class='name'>Egg @ Level {{raid.level}}</span>
-            <span class='right'>Hatches in {{raid.spawn | amTimeAgo}}</span>
+            <span class='name'>Egg</span>
+            <span *ngIf='currentLevel == 0'> ({{raid.level}})</span>
+            <div class='stats'>
+              <div>Hatches in {{raid.spawn | amTimeAgo}}</div>
+              <div>{{raid.location_name}}</div>
+            </div>
 
           </ng-template>
         </div>

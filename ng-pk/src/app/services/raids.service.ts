@@ -109,7 +109,7 @@ export class RaidsService extends GymsService {
 				'color': raid.raid.pokemon_types ? raid.raid.pokemon_types[0].color : '#333333',
 				'latitude': raid.latitude,
 				'longitude': raid.longitude,
-				'spawn': raid.raid.spawn,
+				'spawn': raid.raid.start,
 				'end': raid.raid.end,
 				'team': raid.team_id == 1 ? 'Mystic' : raid.team_id == 2 ? 'Valor' : 'Instinct'
 			}
